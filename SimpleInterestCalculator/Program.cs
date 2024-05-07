@@ -7,7 +7,7 @@ namespace SimpleInterestCalculator
         static void Main(string[] args)
         {
             //Create an Instace of the investment class
-            Investments FirstInvestment = new Investments();
+            Investments firstInvestment = new Investments();
 
             //Prompt the user to enter the principal amount,interest rate and investment duration(in years)
             Console.WriteLine("Welcome to your Simple Interest Calculator");
@@ -27,10 +27,10 @@ namespace SimpleInterestCalculator
             Console.WriteLine("Pls enter your duration");
             int userInvestmentDuration = int.Parse(Console.ReadLine());
 
-            //Assigning User Inputs to Field.
-            FirstInvestment.Principal = userPrincipalAmount;
-            FirstInvestment.Rate = userInterestRate;
-            FirstInvestment.Time = userInvestmentDuration;
+            //Assigning User Inputs to Properties.
+            firstInvestment.Principal = userPrincipalAmount;
+            firstInvestment.Rate = userInterestRate;
+            firstInvestment.Time = userInvestmentDuration;
 
 
             //Call the respective methods to calculate
@@ -40,13 +40,13 @@ namespace SimpleInterestCalculator
             //and investment duration (based on the final amount).
 
             //(a) Calculating Simple Interest
-            double simpleInterestResult=FirstInvestment.CalculateSimpleInterest();
+            double simpleInterestResult=firstInvestment.CalculateSimpleInterest();
             //(b) calculating final Amount
-            double finalAmountResult = FirstInvestment.CalculateFinalAmount();
+            double finalAmountResult = firstInvestment.CalculateFinalAmount();
             //(c) calculating interest rate
-            double interestRateResult = FirstInvestment.CalculateIntrestRate( finalAmountResult , userPrincipalAmount);
+            double interestRateResult = firstInvestment.CalculateIntrestRate( finalAmountResult , userPrincipalAmount);
             //(d) calculating investment duration
-            int investmentDurationResult = FirstInvestment.CalculateInvestmentDuration( (int)userPrincipalAmount, userInterestRate);
+            int investmentDurationResult = firstInvestment.CalculateInvestmentDuration(finalAmountResult, (int)userPrincipalAmount, userInterestRate);
 
             Console.WriteLine($"Your inputed data are Principal :{userPrincipalAmount}.\n Rate: {userInterestRate}.\n Time :{userInvestmentDuration}years");
             Console.WriteLine("-----------------------------------------------------------------");

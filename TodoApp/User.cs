@@ -8,19 +8,23 @@ namespace TodoApp
 {
     public class User
     {
-      //fields 
-      private int _id;
-      private string _name;
-       
-      // Constructor
-      public User (int id , string name)
+        //Fields
+        private int _id;
+        private string _name;
+
+        //constructor
+
+        public User(int id , string name)
         {
             _id = id;
             _name = name;
         }
 
         //Properties
+        
         public int Id { get { return _id; } }
-        public string Name { get { return _name;} }
+        public string Name { get { return _name; } }
+
+
     }
 }
