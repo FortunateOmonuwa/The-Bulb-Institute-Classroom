@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SimpleInterestCalculator
 {
+   
     public class Investments
     {
         //Properties
@@ -30,13 +31,12 @@ namespace SimpleInterestCalculator
         //Method for Calculating Interest Rate
         public double CalculateIntrestRate(double finalAmount, double principal)
         {
-            return ((finalAmount - principal) / (principal * Rate)) * 100;
+            return ((finalAmount - principal) / (principal * Time)) * 100;
         }
         //Method for calculating duration
         public int CalculateInvestmentDuration(double finalAmount, int principal,double rate)
         {
-            return (int)(CalculateSimpleInterest() * 100 / (principal * Time));
-            
+            return (int)((finalAmount - principal) / (principal * rate) * 100);
         }
 
     }
