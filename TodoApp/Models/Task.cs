@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TodoApp.Actions;
 
-namespace TodoApp
+namespace TodoApp.Models
 {
     public class Task
     {
@@ -29,12 +30,12 @@ namespace TodoApp
             _name = name;
             _description = description;
             _dueDate = dueDate;
-            
-           
+
+
         }
 
-        
 
-        
+
+
     }
 }
