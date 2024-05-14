@@ -6,6 +6,8 @@
 
 using OOP.Interfaces;
 using OOP.Models;
+using OOP.Operations;
+using System.Collections;
 
 //Animal animal = new Animal();
 
@@ -80,8 +82,8 @@ List<string> names = new List<string>()
     "Kazeem"
 };
 
-
-
+//Generics are classes that can  accept any data type when creating an object of the class
+//Collections are classes in C# that allow to have a collection or group of any data type
 names.Add("Fortunate");
 //foreach(var name in names)
 //{
@@ -100,8 +102,71 @@ test.Add(5, "Sulaiman");//key and value pairs
 
 foreach (var name in test)
 {
-    Console.WriteLine(name);
+    //Console.WriteLine(name);
 } 
 
 var nameP = test.FirstOrDefault(x=> x.Key == 3);
-Console.Write(nameP);
+//Console.Write(nameP);
+
+ResponseModel<int> response = new ResponseModel<int>();
+
+
+//Console.WriteLine(response.GetValue(30));
+//response.Value = someClass;
+
+var someClass = new Class();
+Dictionary<int, string> classPairs = new Dictionary<int, string>();
+
+classPairs.Add(1, "Kazeem");
+classPairs.Add(2, "Kazeem");
+
+
+foreach (var value in classPairs)
+{
+
+  //  Console.WriteLine(value);
+}
+
+HashSet<int> values = new HashSet<int>();
+values.Add(1);
+values.Add(2);
+values.Add(2);
+values.Add(3);
+values.Add(4);
+values.Add(1);// this guy won't be added because it's the same as the first one
+
+
+ArrayList arrayList = new ArrayList();
+arrayList.Add(values);
+
+
+//Stacks FILO.. First in, last out
+Stack<int> stack = new Stack<int>();
+stack.Push(1);
+stack.Push(2);
+stack.Push(3);
+
+
+stack.Pop();
+//foreach (var value in stack)
+//{
+
+//    Console.WriteLine(value);
+//}
+
+
+//Queues FIFO.. First in, First out
+
+Queue<int> queue = new Queue<int>();
+queue.Enqueue(1);
+queue.Enqueue(2);
+queue.Enqueue(3);
+queue.Enqueue(4);
+
+queue.Dequeue();
+foreach (var value in queue)
+{
+
+    Console.WriteLine(value);
+}
+

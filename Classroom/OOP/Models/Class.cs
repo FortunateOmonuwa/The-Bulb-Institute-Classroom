@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace OOP.Models
 {
-    internal class Class : Animal
+    internal class Class
     {
-       
+        public int ID { get; set; } = 1;
     }
 }
