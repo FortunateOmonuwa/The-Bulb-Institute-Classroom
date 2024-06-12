@@ -21,10 +21,11 @@ namespace VotingSystem.DataAccess.Repository
 
         public async Task<CandidateGetDTO> CreateCandidate(CandidateCreateDTO new_candidate)
         {
+           // var transaction = await database.Database.BeginTransactionAsync();
             try
             {
                 var input_validation = InputValidation
-                    .FormatValidationForFirstNameLastNameAndEmail(new_candidate.FirstName, new_candidate.LastName);
+                    .FormatValidationForFirstNameLastNameAndEmail(new_candidate.FirstName, new_candidate.LastName, new_candidate.Email);
                 if (input_validation == false)
                 {
                     throw new FormatException("Wrong format for credentials");
@@ -65,10 +66,10 @@ namespace VotingSystem.DataAccess.Repository
                     var userprofile_creation_response = await profile.CreateProfile(userProfile);
                     if(userprofile_creation_response < 1)
                     {
-                      //  await DeleteCandidate(newCandidate.Id);
+                      await DeleteCandidate(newCandidate.Id);
                         throw new Exception("Saving userprofile to database was not successful");
                     }
-
+                 //   await transaction.CommitAsync();
                     var candidate = new CandidateGetDTO()
                     {
                         Id = newCandidate.Id,
@@ -84,7 +85,9 @@ namespace VotingSystem.DataAccess.Repository
             }
             catch(Exception ex)
             {
+               // await transaction.RollbackAsync();
                 throw new Exception(ex.Message);
+
             }
         }
 

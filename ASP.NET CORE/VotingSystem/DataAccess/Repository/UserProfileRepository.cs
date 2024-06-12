@@ -24,7 +24,7 @@ namespace VotingSystem.DataAccess.Repository
                 var check_userprofile_for_email = await validator.CheckExistingEmailForUserProfile(profile.Email);
                 if (check_userprofile_for_email == false)
                 {
-                    throw new Exception();
+                    return 0;
                 }
                 var userProfile = new UserProfile()
                 {
@@ -39,9 +39,9 @@ namespace VotingSystem.DataAccess.Repository
             return await database.SaveChangesAsync();
              
             }
-            catch (Exception ex)
+            catch
             {
-                throw new Exception(ex.Message);
+                return -1;
             }
         }
     }
