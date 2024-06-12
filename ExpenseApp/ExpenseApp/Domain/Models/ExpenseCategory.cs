@@ -25,5 +25,7 @@ namespace ExpenseApp.Domain.Models
 
        // [ForeignKey(nameof(User))]
         public int? UserId { get; set; }
+
+        
     }
 }

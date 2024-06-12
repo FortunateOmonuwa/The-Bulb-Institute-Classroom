@@ -361,5 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/ASP.NET CORE/VotingSystem.API/appsettings.Development.json
-/ASP.NET CORE/VotingSystem.API/appsettings.json
+
+/appsettings.json
+/appsettings.Development.json

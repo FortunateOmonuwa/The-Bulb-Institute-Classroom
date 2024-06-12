@@ -11,3 +11,6 @@ foreach (var category in categories)
 {
     Console.WriteLine($"Id: {category.Id}\nName: {category.Name}\nUserId: {category.UserId ?? 0}");
 }
+
+
+//ASP.NET
