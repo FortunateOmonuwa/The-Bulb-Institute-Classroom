@@ -1,0 +1,6 @@
+@Temperature_Calculator_HostAddress = http://localhost:5193
+
+GET {{Temperature_Calculator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

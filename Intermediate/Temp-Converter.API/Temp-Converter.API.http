@@ -1,0 +1,6 @@
+@Temp_Converter.API_HostAddress = http://localhost:5239
+
+GET {{Temp_Converter.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

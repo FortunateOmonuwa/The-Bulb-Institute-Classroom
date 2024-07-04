@@ -363,3 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 /ASP.NET CORE/VotingSystem.API/appsettings.Development.json
 /ASP.NET CORE/VotingSystem.API/appsettings.json
+/Temperature-Calculator/Temperature-Calculator/appsettings.json
+/Temperature-Calculator/Temperature-Calculator/appsettings.Development.json
+/Intermediate/Temp-Converter.API/appsettings.Development.json
+/Intermediate/Temp-Converter.API/appsettings.json
