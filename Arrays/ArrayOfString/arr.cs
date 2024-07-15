@@ -8,7 +8,7 @@ namespace ArrayOfString
 {
     public class arr
     {
-        string[] names = new string[] { "akanbi", "afeez", "fortunate", "kazeem", "sulaimon" };
+        string[] names = new string[] { "aknbi", "afeez", "fortunate", "kazeem", "sulaimon" };
          
       public void Getnames()
         {

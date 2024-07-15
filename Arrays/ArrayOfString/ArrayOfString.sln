@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrayOfString", "ArrayOfString.csproj", "{84F5B367-5C0F-4B0A-9349-A463C7283324}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrayOfString.AK", "ArrayOfString.AK.csproj", "{84F5B367-5C0F-4B0A-9349-A463C7283324}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
