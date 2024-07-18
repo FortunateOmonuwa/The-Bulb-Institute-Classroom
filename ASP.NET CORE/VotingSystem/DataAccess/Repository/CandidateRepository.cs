@@ -24,6 +24,7 @@ namespace VotingSystem.DataAccess.Repository
            // var transaction = await database.Database.BeginTransactionAsync();
             try
             {
+                //to check if the firstname, lastnmae or email is in the right format
                 var input_validation = InputValidation
                     .FormatValidationForFirstNameLastNameAndEmail(new_candidate.FirstName, new_candidate.LastName, new_candidate.Email);
                 if (input_validation == false)
@@ -32,6 +33,7 @@ namespace VotingSystem.DataAccess.Repository
                 }
                 else
                 {
+                    //to check if the candidate exists
                     var checkdb_for_name_and_email = await validator
                         .CheckExistingNameAndEmailOnCandidates(new_candidate.FirstName, new_candidate.LastName, new_candidate.Email);
                     if(checkdb_for_name_and_email == false)
@@ -56,7 +58,7 @@ namespace VotingSystem.DataAccess.Repository
                     var userProfile = new UserProfileCreateDTO()
                     {
                         Email = newCandidate.Email,
-                        UserCode = "Candidate",
+                       // UserCode = "Candidate",
                         UserType = "Candidate",
                         FirstName = newCandidate.FirstName,
                         LastName = newCandidate.LastName,
@@ -64,6 +66,7 @@ namespace VotingSystem.DataAccess.Repository
                     };
 
                     var userprofile_creation_response = await profile.CreateProfile(userProfile);
+                    //Deletes candidate if the creation of userprofile for the candidate is unsuccessful
                     if(userprofile_creation_response < 1)
                     {
                       await DeleteCandidate(newCandidate.Id);
@@ -75,7 +78,7 @@ namespace VotingSystem.DataAccess.Repository
                         Id = newCandidate.Id,
                         Email = newCandidate.Email,
                         Name = newCandidate.FirstName + newCandidate.LastName,
-                        UserCode = userProfile.UserCode
+                        Code = userProfile.UserCode
                        
                     };
 
@@ -114,9 +117,34 @@ namespace VotingSystem.DataAccess.Repository
             }
         }
 
-        public Task<Candidate> GetCandidateByID(int candidate_id)
+        public async Task<CandidateGetDTO> GetCandidateByID(int candidate_id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var candidate = await validator.CheckCanditateByID(candidate_id);
+                if( candidate is null)
+                {
+                    return null;
+                }
+                else
+                {
+                    var userProfile = await profile.GetProfile(candidate.Email);
+                    var fetchedCandidate = new CandidateGetDTO
+                    {
+                        Id = candidate.Id,
+                        Email = candidate.Email,
+                        Name = candidate.FirstName + candidate.LastName,
+                        Code = userProfile.UserCode,
+                        Type = userProfile.UserType
+
+                    };
+                    return fetchedCandidate;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public Task<IEnumerable<Candidate>> GetAllCandidates(CandidateCreateDTO new_candidate)

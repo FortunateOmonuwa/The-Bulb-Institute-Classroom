@@ -35,5 +35,24 @@ namespace VotingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet ("/{candidate_id}")]
+        public async Task<IActionResult> FetchCandidate(int candidate_id)
+        {
+            try
+            {
+                var fetched_candidate = await candidate.GetCandidateByID(candidate_id);
+                if(fetched_candidate == null)
+                {
+                    return NotFound(fetched_candidate);
+                }
+                return Ok(fetched_candidate);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

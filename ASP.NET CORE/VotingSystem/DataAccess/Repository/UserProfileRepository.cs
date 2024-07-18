@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using VotingSystem.DataAccess.DataContext;
 using VotingSystem.DataAccess.Interfaces;
 using VotingSystem.DataAccess.Utilities;
@@ -42,6 +43,28 @@ namespace VotingSystem.DataAccess.Repository
             catch
             {
                 return -1;
+            }
+
+          
+        }
+
+        public async Task<UserProfile> GetProfile(string email)
+        {
+            try
+            {
+                var profiile = await database.UserProfiles.FirstOrDefaultAsync(x => x.Email == email);
+                if (profiile == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return profiile;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
