@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OrganizationMgtSys.DataAccess.DataContext;
+using OrganizationMgtSys.DataAccess.Interfaces;
+using OrganizationMgtSys.DataAccess.Repositories;
+using OrganizationMgtSys.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,11 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Connection"));
 });
+//Register Automapper
+builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddTransient<IBaseService<Company>, CompanyRepository>();
+builder.Services.AddTransient<IBaseService<Staff>, StaffRepository>();
 
 var app = builder.Build();
 
