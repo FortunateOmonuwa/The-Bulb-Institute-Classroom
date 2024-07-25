@@ -41,7 +41,8 @@ namespace OrganizationMgtSys.DataAccess.Repositories
         {
             try
             {
-                var company = await database.Companies.FirstOrDefaultAsync(x => x.Id == id) ?? throw new ArgumentNullException($"Company with Id {id} doesn't exist on our system");
+                var company = await database.Companies.FirstOrDefaultAsync(x => x.Id == id) 
+                    ?? throw new ArgumentNullException($"Company with Id {id} doesn't exist on our system");
                 database.Companies.Remove(company);
                 await database.SaveChangesAsync();
                 return "Delete operation successful";
@@ -52,7 +53,7 @@ namespace OrganizationMgtSys.DataAccess.Repositories
             }
         }
 
-        public async Task<List<Company>> GetAll() => await database.Companies.ToListAsync();
+        public async Task<List<Company>> GetAll() => await database.Companies.Include(x => x.Address).ToListAsync();
        
 
         public async Task<Company> GetAsync(Guid id) => 

@@ -2,7 +2,7 @@
 
 namespace VotingSystem.DataAccess.Utilities
 {
-    public static class DataEncryption
+    public static class DataEncryption 
     {
         public static string EncryptPasswordUsingBcrypt(string password)
         {
@@ -15,6 +15,17 @@ namespace VotingSystem.DataAccess.Utilities
                 var newPassword = BCrypt.Net.BCrypt.HashPassword(password);
                 return newPassword;
             }
+        }
+
+        public static bool DecryptPasswordUsingBcrypt(string password, string passwordHash)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException("Password is incorrect");
+            }
+             var validation = BCrypt.Net.BCrypt.Verify(password, passwordHash);
+            return validation;
+           
         }
     }
 }

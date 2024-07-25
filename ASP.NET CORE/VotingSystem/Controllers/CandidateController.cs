@@ -54,5 +54,9 @@ namespace VotingSystem.Controllers
             }
         }
 
+
+        [HttpGet]
+        public async Task<ActionResult> FetcAllCandidates() => Ok(await candidate.GetAllCandidates());
+
     }
 }

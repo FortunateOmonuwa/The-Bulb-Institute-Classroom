@@ -19,6 +19,7 @@ builder.Services.AddDbContext<VotingSystemContext>(options =>
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
 builder.Services.AddTransient<DatabaseModelValidator>();
 builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddTransient<IAuthService, AuthRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

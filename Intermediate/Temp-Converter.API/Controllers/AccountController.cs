@@ -21,12 +21,14 @@ namespace Temp_Converter.API.Controllers
             try
             {
                 var response = _account.CreateAccount(new_acc);
-                return Ok(response);
+                return Ok(new { Message = response });
             }
             catch(Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+
+
     }
 }

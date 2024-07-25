@@ -1,4 +1,5 @@
-﻿using VotingSystem.DataAccess.DataContext;
+﻿using Microsoft.EntityFrameworkCore;
+using VotingSystem.DataAccess.DataContext;
 using VotingSystem.DataAccess.Interfaces;
 using VotingSystem.DataAccess.Utilities;
 using VotingSystem.Domain.DTOs.Candidates;
@@ -62,7 +63,7 @@ namespace VotingSystem.DataAccess.Repository
                         UserType = "Candidate",
                         FirstName = newCandidate.FirstName,
                         LastName = newCandidate.LastName,
-                        Password = DataEncryption.EncryptPasswordUsingBcrypt(new_candidate.Password),              
+                        Password = new_candidate.Password,              
                     };
 
                     var userprofile_creation_response = await profile.CreateProfile(userProfile);
@@ -147,10 +148,8 @@ namespace VotingSystem.DataAccess.Repository
             }
         }
 
-        public Task<IEnumerable<Candidate>> GetAllCandidates(CandidateCreateDTO new_candidate)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<IEnumerable<Candidate>> GetAllCandidates() => await database.Candidates.ToListAsync();
+      
 
         public Task<Candidate> UpdateCandidate(Candidate candidate_to_update)
         {

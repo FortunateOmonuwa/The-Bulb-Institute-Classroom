@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 //////////////////////////////////////////////////////////
 builder.Services.AddTransient<ITemperature, TemperateRepository>();
 builder.Services.AddSingleton<IAccount, AccountRepository>();
-
+builder.Services.AddHttpClient<IAccount, AccountRepository>();
 
 var app = builder.Build();
 
