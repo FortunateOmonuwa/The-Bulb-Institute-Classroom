@@ -12,7 +12,7 @@ namespace OrganizationMgtSys.Domain.Models
         [Required, DataType(DataType.EmailAddress)]
         public string Email { get; set; }
         public string PasswordHash { get; set; } 
-        public DateTime HireDate { get; set; } = DateTime.Now;
+        public DateTime HireDate { get; set; } = DateTime.Now.Date;
         [Required, StringLength(10)]
         public string StaffUniqueNumber { get; set; }
         //[Required (ErrorMessage ="Role must be specified")]

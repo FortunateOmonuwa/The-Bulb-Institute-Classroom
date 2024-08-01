@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
 using OrganizationMgtSys.DataAccess.DataContext;
 using OrganizationMgtSys.DataAccess.Interfaces;
 using OrganizationMgtSys.Domain.Models;
@@ -34,6 +35,8 @@ namespace OrganizationMgtSys.DataAccess.Repositories
                 var role = await database.Role.FirstOrDefaultAsync(x => x.Id.Equals(1));
                 entity.Role = role.Name;
                 entity.RoleID = role.Id;
+                entity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(entity.PasswordHash);
+                entity.HireDate = DateTime.Now.Date;
                 company.Staffs.Add(entity);
                 //await database.Staff.AddAsync(entity);
                 await database.SaveChangesAsync();
