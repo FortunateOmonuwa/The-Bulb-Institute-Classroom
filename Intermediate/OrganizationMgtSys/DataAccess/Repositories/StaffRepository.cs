@@ -1,13 +1,48 @@
-﻿using OrganizationMgtSys.DataAccess.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using OrganizationMgtSys.DataAccess.DataContext;
+using OrganizationMgtSys.DataAccess.Interfaces;
 using OrganizationMgtSys.Domain.Models;
 
 namespace OrganizationMgtSys.DataAccess.Repositories
 {
     public class StaffRepository : IBaseService<Staff>
     {
-        public Task<Staff> CreateAsync(Staff entity)
+        private readonly ApplicationContext database;
+        public StaffRepository(ApplicationContext database)
         {
-            throw new NotImplementedException();
+            this.database = database;
+        }
+        public async Task<Staff> CreateAsync(Staff entity)
+        {
+            try
+            {
+               if(entity.FirstName == null || entity.LastName == null || entity.Email == null)
+               {
+                    throw new FormatException(" Entry cannot be null");
+               }
+
+               //checking for the company with the company id from the staff being created
+               var company = await database.Companies
+                    .Include(x=> x.Staffs)
+                    .FirstOrDefaultAsync(x => x.Id == entity.CompanyID);
+
+                var staff = company.Staffs.FirstOrDefault(s => s.Email == entity.Email);
+                if (staff != null)
+                {
+                    throw new Exception($"Staff with Email: {entity.Email} already exists in {company.Name}");
+                }
+                var role = await database.Role.FirstOrDefaultAsync(x => x.Id.Equals(1));
+                entity.Role = role.Name;
+                entity.RoleID = role.Id;
+                company.Staffs.Add(entity);
+                //await database.Staff.AddAsync(entity);
+                await database.SaveChangesAsync();
+                return entity;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public Task<string> DeleteAsync(Guid id)

@@ -15,8 +15,11 @@ namespace OrganizationMgtSys.Domain.Models
         public DateTime HireDate { get; set; } = DateTime.Now;
         [Required, StringLength(10)]
         public string StaffUniqueNumber { get; set; }
-        [Required (ErrorMessage ="Role must be specified")]
-        public Role Role { get; set; } 
+        //[Required (ErrorMessage ="Role must be specified")]
+        //public Role Role { get; set; } 
+        public string Role { get; set; }
+        [ForeignKey(nameof(Role))]
+        public int RoleID { get; set; }
         public bool IsClockedIn { get; set; }
         public bool IsLoggedIn { get; set; }
 

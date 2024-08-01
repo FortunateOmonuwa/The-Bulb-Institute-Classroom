@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrganizationMgtSys.DataAccess.Interfaces;
 using OrganizationMgtSys.Domain.DTOS.Company;
+using OrganizationMgtSys.Domain.DTOS.StaffDTO;
 using OrganizationMgtSys.Domain.Models;
 
 namespace OrganizationMgtSys.Controllers
@@ -12,11 +14,13 @@ namespace OrganizationMgtSys.Controllers
     public class CompanyController : ControllerBase
     {
         private readonly IBaseService<Company> _companyService;
+        private readonly IBaseService<Staff> _staffService;
         private IMapper mapper;
-        public CompanyController(IBaseService<Company> companyService, IMapper mapper)
+        public CompanyController(IBaseService<Company> companyService, IMapper mapper, IBaseService<Staff> staffService)
         {
             _companyService = companyService;
             this.mapper = mapper;
+            _staffService = staffService;
         }
 
         [HttpPost("CreateNewCompany")]
@@ -96,6 +100,28 @@ namespace OrganizationMgtSys.Controllers
                 }
             }
             catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("CreateStaff")]
+        public async Task<IActionResult> CreateStaff([FromBody]StaffCreateDTO staff)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model state");
+                }
+                else
+                {
+                    var mapstaff = mapper.Map<Staff>(staff);
+                    var newStaff = await _staffService.CreateAsync(mapstaff);
+                    return Ok(newStaff);
+                }
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
