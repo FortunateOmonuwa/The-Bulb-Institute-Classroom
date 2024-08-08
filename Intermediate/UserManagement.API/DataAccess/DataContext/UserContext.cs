@@ -16,9 +16,11 @@ namespace UserManagement.API.DataAccess.DataContext
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Role>().HasData(new Role { Id = 1, Name = "User"}, new Role { Id = 2, Name = "Admin"});
+
             modelBuilder.Entity<UserRole>().HasKey(k => new { k.RoleID, k.UserID });
-            modelBuilder.Entity<UserRole>().HasOne(u => u.User).WithMany(ur => ur.UserRoles).HasForeignKey(u => u.UserID);
-            modelBuilder.Entity<UserRole>().HasOne(u => u.Role).WithMany(ur => ur.UserRoles).HasForeignKey(u => u.RoleID);
+
+            modelBuilder.Entity<UserRole>().HasOne(u => u.User).WithMany(ur => ur.Roles).HasForeignKey(u => u.UserID);
+            modelBuilder.Entity<UserRole>().HasOne(u => u.Role).WithMany(ur => ur.Users).HasForeignKey(u => u.RoleID);
         }
     }
 }

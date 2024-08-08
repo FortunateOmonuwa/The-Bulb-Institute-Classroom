@@ -5,7 +5,9 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Temp-Converter.API", "Temp-Converter.API\Temp-Converter.API.csproj", "{320EA9E1-CF9B-4443-8399-1D17BBC88A64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrganizationMgtSys", "OrganizationMgtSys\OrganizationMgtSys.csproj", "{A6F5964E-CA80-4EF6-AC17-12D670EE651E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrganizationMgtSys", "OrganizationMgtSys\OrganizationMgtSys.csproj", "{A6F5964E-CA80-4EF6-AC17-12D670EE651E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManagement.API", "UserManagement.API\UserManagement.API.csproj", "{293982E7-1A37-497F-A1FA-959FA17894BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A6F5964E-CA80-4EF6-AC17-12D670EE651E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6F5964E-CA80-4EF6-AC17-12D670EE651E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6F5964E-CA80-4EF6-AC17-12D670EE651E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{293982E7-1A37-497F-A1FA-959FA17894BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{293982E7-1A37-497F-A1FA-959FA17894BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{293982E7-1A37-497F-A1FA-959FA17894BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{293982E7-1A37-497F-A1FA-959FA17894BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

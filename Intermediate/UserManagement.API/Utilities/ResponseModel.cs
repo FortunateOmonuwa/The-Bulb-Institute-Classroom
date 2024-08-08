@@ -8,12 +8,13 @@
         public int? ResultCode { get; set; }
 
         //Method for handling failed request
-        public ResponseModel<T> FailedResultData()
+        public ResponseModel<T> FailedResultData(T res)
         {
             var r = new ResponseModel<T>
             {
                 Message = "Operation was not successful",              
                 IsSuccessful = false,
+                Result = res,
                 ResultCode = 400
             };
 

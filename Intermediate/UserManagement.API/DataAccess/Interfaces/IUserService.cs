@@ -7,5 +7,6 @@ namespace UserManagement.API.DataAccess.Interfaces
     public interface IUserService
     {
         Task<ResponseModel<User>> Register(Register new_user);
+        Task<ResponseModel<string>> VerifyAccount(string token);
     }
 }

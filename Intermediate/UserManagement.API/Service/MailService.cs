@@ -23,6 +23,7 @@ namespace UserManagement.API.Service
         {
             try
             {
+                var newBody = $"<h1>{mail.Body}</h1>";
                 var response = new ResponseModel<string>();
 
                 //use mimekit to construct the message/mail
@@ -34,7 +35,7 @@ namespace UserManagement.API.Service
                     Subject = mail.Subject,
                     Body = new TextPart(TextFormat.Html)
                     {
-                        Text = mail.Body
+                        Text = newBody
                     },
                 };
 
