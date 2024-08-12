@@ -8,5 +8,6 @@ namespace UserManagement.API.DataAccess.Interfaces
     {
         Task<ResponseModel<User>> Register(Register new_user);
         Task<ResponseModel<string>> VerifyAccount(string token);
+        Task<ResponseModel<string>> Login(Login login);
     }
 }

@@ -18,12 +18,37 @@ namespace UserManagement.API.DataAccess.Repositories
             this.mailService = mailService;
             this.context = context;
         }
+
+        public async Task<ResponseModel<string>> Login(Login login)
+        {
+            var response = new ResponseModel<string>();
+            var user = await context.Users.FirstOrDefaultAsync(X => X.Email == login.Email);
+            var confirmPassword = Utility.VerifyPasswordHash(login.Password, user.PasswordHash, user.PasswordSalt);
+            if(user == null || !confirmPassword)
+            {
+                response = response.FailedResultData("Email or Password is incorrect");
+            }
+            else if(!user.IsVerified)
+            {
+                response = response.FailedResultData("Account not verified... Please verify your account");
+            }
+            else
+            {
+
+            }
+
+        }
+
         public async Task<ResponseModel<User>> Register(Register new_user)
         {
             var response = new ResponseModel<User>();
 
             try
             {
+                if(new_user.Password != new_user.ConfirmPassword)
+                {
+                    throw new Exception("Passwords do not match");
+                }
                 Utility.CreatePasswordHash(new_user.Password, out byte[] passwordHash, out byte[] passwordSalt);
                 var user = new User
                 {
@@ -68,7 +93,7 @@ namespace UserManagement.API.DataAccess.Repositories
                 var user = await context.Users.FirstOrDefaultAsync(x => x.VerificationToken == token);
                 if (user == null)
                 {
-                 response =   response.FailedResultData("Invalid token");
+                 response = response.FailedResultData("Invalid token");
                   
                 }
                 else if (DateTime.Now > DateTime.Parse( user.TokenExpiration))
