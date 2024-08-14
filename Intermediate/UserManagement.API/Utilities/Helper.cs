@@ -2,7 +2,7 @@
 
 namespace UserManagement.API.Utilities
 {
-    public static class Utility
+    public static class Helper
     {
         public static void CreatePasswordHash(string password, out byte[] password_hash, out byte[] password_salt)
         {

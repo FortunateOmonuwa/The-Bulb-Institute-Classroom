@@ -1,5 +1,11 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using UserManagement.API.DataAccess.DataContext;
 using UserManagement.API.DataAccess.Interfaces;
 using UserManagement.API.Domain;
@@ -13,28 +19,68 @@ namespace UserManagement.API.DataAccess.Repositories
     {
         private readonly  IMailService mailService;
         private readonly UserContext context;
-        public UserRepository(IMailService mailService, UserContext context)
+        private readonly AppSettings appSettings;
+        public UserRepository(IMailService mailService, UserContext context, IOptions<AppSettings> appSettings)
         {
             this.mailService = mailService;
             this.context = context;
+            this.appSettings = appSettings.Value;
         }
 
         public async Task<ResponseModel<string>> Login(Login login)
         {
-            var response = new ResponseModel<string>();
-            var user = await context.Users.FirstOrDefaultAsync(X => X.Email == login.Email);
-            var confirmPassword = Utility.VerifyPasswordHash(login.Password, user.PasswordHash, user.PasswordSalt);
-            if(user == null || !confirmPassword)
+            try
             {
-                response = response.FailedResultData("Email or Password is incorrect");
-            }
-            else if(!user.IsVerified)
-            {
-                response = response.FailedResultData("Account not verified... Please verify your account");
-            }
-            else
-            {
+                var response = new ResponseModel<string>();
+                var user = await context.Users
+                    .Include(x => x.Roles)
+                    .ThenInclude(x => x.Role)
+                    .FirstOrDefaultAsync(X => X.Email == login.Email);
+                var confirmPassword = Helper.VerifyPasswordHash(login.Password, user.PasswordHash, user.PasswordSalt);
+                if (user == null || !confirmPassword)
+                {
+                    response = response.FailedResultData("Email or Password is incorrect");
+                }
+                else if (!user.IsVerified)
+                {
+                    response = response.FailedResultData("Account not verified... Please verify your account");
+                }
+                else
+                {
+                    var userRoles = user.Roles.Select(x => x.Role.Name).ToList();
+                    //claims 
+                    var claims = new List<Claim>
+                {
+                    new (ClaimTypes.Email, user.Email),
+                    new("VerificationStatus", user.IsVerified ? "Verified" : "Unverified"),
+                };
 
+                    foreach (var role in userRoles)
+                    {
+                        claims.Add(new Claim("Role", role));
+                    }
+
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey));
+                    var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                    var token = new JwtSecurityToken(
+                            appSettings.Issuer,
+                            signingCredentials: signingCredentials,
+                            claims: claims,
+                            expires: DateTime.Now.AddMinutes(60)
+
+                        );
+
+                    var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                    response = response.SuccessResultData(jwtToken);
+
+                }
+                return response;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
 
         }
@@ -49,13 +95,13 @@ namespace UserManagement.API.DataAccess.Repositories
                 {
                     throw new Exception("Passwords do not match");
                 }
-                Utility.CreatePasswordHash(new_user.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                Helper.CreatePasswordHash(new_user.Password, out byte[] passwordHash, out byte[] passwordSalt);
                 var user = new User
                 {
                     Email = new_user.Email,
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt,
-                    VerificationToken = Utility.CreateRandomVerificationToken().Substring(0, 7),
+                    VerificationToken = Helper.CreateRandomVerificationToken().Substring(0, 7),
                     TokenExpiration = DateTime.Now.AddMinutes(1).ToString(),
                     VerifiedAt = "Unverified"
                 };

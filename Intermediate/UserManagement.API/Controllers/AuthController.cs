@@ -67,5 +67,18 @@ namespace UserManagement.API.Controllers
                 return BadRequest(req);
             }
         }
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody]Login login)
+        {
+            try
+            {
+                var req = await userService.Login(login);
+                return Ok(req);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
