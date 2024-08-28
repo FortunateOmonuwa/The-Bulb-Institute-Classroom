@@ -27,6 +27,9 @@ namespace UserManagement.API.DataAccess.Repositories
             this.appSettings = appSettings.Value;
         }
 
+        public async Task<List<User>> GetAllUsers() => await context.Users.ToListAsync();
+       
+
         public async Task<ResponseModel<string>> Login(Login login)
         {
             try
@@ -50,14 +53,14 @@ namespace UserManagement.API.DataAccess.Repositories
                     var userRoles = user.Roles.Select(x => x.Role.Name).ToList();
                     //claims 
                     var claims = new List<Claim>
-                {
-                    new (ClaimTypes.Email, user.Email),
-                    new("VerificationStatus", user.IsVerified ? "Verified" : "Unverified"),
-                };
+                    {
+                        new (ClaimTypes.Email, user.Email),
+                      //  new("VerificationStatus", user.IsVerified ? "Verified" : "Unverified"),
+                    };
 
                     foreach (var role in userRoles)
                     {
-                        claims.Add(new Claim("Role", role));
+                        claims.Add(new Claim(ClaimTypes.Role, role));
                     }
 
                     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.SecretKey));

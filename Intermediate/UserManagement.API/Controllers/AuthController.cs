@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserManagement.API.DataAccess.Interfaces;
 using UserManagement.API.DTOs;
@@ -5,6 +6,7 @@ using UserManagement.API.Service;
 
 namespace UserManagement.API.Controllers
 {
+
     [ApiController]
     [Route("[controller]")]
     public class AuthController : ControllerBase
@@ -18,6 +20,7 @@ namespace UserManagement.API.Controllers
             this.mailService = mailService;  
             this.userService = userService;
         }
+        [Authorize (Roles ="Admin")]
         [HttpPost("SendMail")]
         public async Task<IActionResult> SendMail(MailRequest mail)
         {
@@ -79,6 +82,14 @@ namespace UserManagement.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var res = await userService.GetAllUsers();
+            return Ok(res);
         }
     }
 }
