@@ -10,5 +10,6 @@ namespace UserManagement.API.DataAccess.Interfaces
         Task<ResponseModel<string>> VerifyAccount(string token);
         Task<ResponseModel<string>> Login(Login login);
         Task<List<User>> GetAllUsers();
+        Task<User> GetAllUsers(int id);
     }
 }

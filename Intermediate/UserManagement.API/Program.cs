@@ -26,7 +26,7 @@ builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSet
 
 builder.Services.AddTransient<IMailService, MailService>();
 builder.Services.AddTransient<IUserService, UserRepository > ();
-
+builder.Services.AddMemoryCache();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     //cookie based authentication
     //OAuth/Open ID authentication
@@ -46,9 +46,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+//Configuration for Authorization
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "Authorize", Version = "v1" });
+    options.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "UserManager", Version = "v1" });
     options.AddSecurityDefinition(name: "Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,

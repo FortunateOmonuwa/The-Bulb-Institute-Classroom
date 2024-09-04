@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,15 +21,41 @@ namespace UserManagement.API.DataAccess.Repositories
         private readonly  IMailService mailService;
         private readonly UserContext context;
         private readonly AppSettings appSettings;
-        public UserRepository(IMailService mailService, UserContext context, IOptions<AppSettings> appSettings)
+        private readonly IMemoryCache cache;
+        public UserRepository(IMailService mailService, UserContext context, IOptions<AppSettings> appSettings, IMemoryCache cache)
         {
             this.mailService = mailService;
             this.context = context;
             this.appSettings = appSettings.Value;
+            this.cache = cache;
         }
 
-        public async Task<List<User>> GetAllUsers() => await context.Users.ToListAsync();
+        public async Task<List<User>> GetAllUsers()
+        {
+            var userCacheKey = "AllUsers";
+            var userCache = cache.TryGetValue(userCacheKey, out  List<User> users);
+            if(userCache == false)
+            {
+                users = await context.Users.ToListAsync();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(20),
+                    SlidingExpiration = TimeSpan.FromMinutes(7),
+                };
+
+                cache.Set(userCacheKey, users, cacheEntryOptions);
+            }
+
+            return users;
+        }
        
+        public async Task<User> GetAllUsers(int id)
+        {
+            var users = await GetAllUsers();
+            var user = users.Where(x => x.Id == id).FirstOrDefault();
+            return user;
+        }
 
         public async Task<ResponseModel<string>> Login(Login login)
         {

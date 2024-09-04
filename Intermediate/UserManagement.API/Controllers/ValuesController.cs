@@ -23,6 +23,14 @@ namespace UserManagement.API.Controllers
         {
             var res = await userService.GetAllUsers();
             return Ok(res);
+        }  
+
+        [Authorize(Roles = "Admin, User")]
+        [HttpGet("GetUsers")]
+        public async Task<IActionResult> GetUsers(int id)
+        {
+            var res = await userService.GetAllUsers(id);
+            return Ok(res);
         }
     }
 }
