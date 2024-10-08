@@ -1,0 +1,8 @@
+﻿namespace ManagementSystemAPI.Domain.DTOS.LoginDTO
+{
+    public class Login
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}

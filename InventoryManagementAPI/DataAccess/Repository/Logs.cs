@@ -6,6 +6,7 @@ using InventoryManagementAPI.DTOs.Register_login;
 using InventoryManagementAPI.Helper;
 using InventoryManagementAPI.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,12 +20,85 @@ namespace InventoryManagementAPI.DataAccess.Repository
         private readonly IEmailService _emailService;
         private readonly BaseSetup _setup;
         private readonly ApplicationContext _ctx;
+        private readonly IMemoryCache _cache;
 
-        public Logs(IEmailService emailService, IOptions<BaseSetup> setup, ApplicationContext ctx)
+        public Logs(IEmailService emailService, IOptions<BaseSetup> setup, ApplicationContext ctx, IMemoryCache cache)
         {
             _emailService = emailService;
             _setup = setup.Value;
             _ctx = ctx;
+            _cache = cache;
+        }
+
+        public async Task<ResponseModel<string>> DeleteUser(Guid id)
+        {   var response = new ResponseModel<string>();
+            try
+            {
+                var users = await GetAllUsers();
+                var user = users.Where(x=>x.Id == id).FirstOrDefault();
+                if(user is null)
+                {
+                    throw new Exception("User does not exist");
+                }
+                _ctx.Users.Remove(user);
+                var res = await _ctx.SaveChangesAsync();
+                if(res > 0)
+                {
+                _cache.Remove(user);
+                    response = response.SuccessResult("User deleted successfully");
+                }
+                else
+                {
+                    response = response.FailedResult("Unable to delete from database");
+                }
+                
+                
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return response;
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            // Adding  caching 
+            var userCacheKey = "AllUsrs";
+            var userCache = _cache.TryGetValue(userCacheKey, out List<User> users);
+            if(userCache == false)
+            {
+                users = await _ctx.Users.ToListAsync();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30),
+                    SlidingExpiration = TimeSpan.FromMinutes(20),
+                };
+
+                _cache.Set(userCacheKey,users,cacheEntryOptions);
+            }
+            return users;
+        }
+
+     
+
+        public async Task<User> GetUserByID(Guid id)
+        {
+            try
+            {
+                var users = await GetAllUsers();
+                var user = users.Where(x=>x.Id  == id).FirstOrDefault();
+                if(user is null)
+                {
+                    throw new Exception("User does not exist");
+                }
+                return user;
+                
+
+            }catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<ResponseModel<string>> Login(Login login)
@@ -47,8 +121,7 @@ namespace InventoryManagementAPI.DataAccess.Repository
                     // Claims
                     var claims = new List<Claim>
                     {
-                        new("Email",user.Email),
-                        new("VerificationStatus", user.Isverified.ToString()),
+                        new(ClaimTypes.Email,user.Email),
                         
                    
                     };
@@ -155,6 +228,7 @@ namespace InventoryManagementAPI.DataAccess.Repository
                         VerificationToken = Utils.CreateRandomVerificationToken().Substring(0, 7),
                         VerifiedAt = "unverified",
                         TokenExpiration = DateTime.Now.AddMinutes(5).ToString(),
+                     
 
                     };
                     await _ctx.Users.AddAsync(newUser);
@@ -199,9 +273,147 @@ namespace InventoryManagementAPI.DataAccess.Repository
             }
         }
 
-        public Task<ResponseModel<string>> RegisterStaff(Register user)
+        public async Task<ResponseModel<string>> RegisterCustumer(Register user)
         {
-            throw new NotImplementedException();
+            var response = new ResponseModel<string>();
+            try
+            {
+                var confirmIfEmailAlreadyExist = await _ctx.Users.AnyAsync(x => x.Email == user.Email);
+
+                if (confirmIfEmailAlreadyExist)
+                {
+                    response = response.FailedResult("Email already exist, pls login");
+                }
+                else if (user.Password != user.ConfirmPassword)
+                {
+                    response = response.FailedResult("Password does not match,Pls try again");
+                }
+                else
+                {
+
+                    var newUser = new User
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        PasswordHash = Utils.EncryptPassword(user.Password),
+                        VerificationToken = Utils.CreateRandomVerificationToken().Substring(0, 7),
+                        VerifiedAt = "unverified",
+                        TokenExpiration = DateTime.Now.AddMinutes(5).ToString(),
+
+
+                    };
+                    await _ctx.Users.AddAsync(newUser);
+                    var res = await _ctx.SaveChangesAsync();
+
+                    //Update Admin Role to the registartion
+                    var role = await _ctx.Roles.FirstOrDefaultAsync(x => x.Id == 3);
+                    var userRole = new UserRole
+                    {
+                        RoleID = role.Id,
+                        Role = role,
+                        UserID = newUser.Id,
+                        User = newUser,
+                    };
+
+                    newUser.Roles.Add(userRole);
+                    await _ctx.SaveChangesAsync();
+                    if (res > 0)
+                    {
+                        var bodyMsg = $"<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Email Verification</title>\r\n</head>\r\n<body style=\"margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;\">\r\n    <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border: 1px solid #ddd;\">\r\n        <tr>\r\n            <td align=\"center\" style=\"padding: 20px 0;\">\r\n                <h2 style=\"color: #333; margin: 0;\">Email Verification</h2>\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <td style=\"padding: 10px 20px; color: #555; font-size: 16px; line-height: 1.5; text-align: center;\">\r\n                <p>Thank you {newUser.FirstName} for signing up! Please use the OTP code below to verify your email address. This code will expire in 5 minutes : {DateTime.Now.AddMinutes(5).ToString("g")}.</p>\r\n                <p style=\"font-size: 18px; font-weight: bold; color: #007bff; margin: 20px 0; text-align: center;\">\r\n                    <span style=\"background-color: #f0f0f0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 5px; display: inline-block;\">{newUser.VerificationToken}</span>\r\n                </p>\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <td style=\"padding: 20px 0; text-align: center; color: #777; font-size: 12px;\">\r\n                <p>If you did not request this, please ignore this email.</p>\r\n            </td>\r\n        </tr>\r\n    </table>\r\n</body>\r\n</html>\r\n";
+                        var sendMail = new MailRequest
+                        {
+                            Reciever = newUser.Email,
+                            Subject = "Verify your email",
+                            Body = bodyMsg
+                        };
+                        var mail = _emailService.SendEmailAsync(sendMail);
+                        response = response.SuccessResult($"You have successfully created an account,Pls check your email to verify your account");
+                    }
+                    else
+                    {
+                        response = response.FailedResult("Error trying to save to database");
+                    }
+                }
+                return response;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ResponseModel<string>> RegisterStaff(Register user)
+        {   var response = new ResponseModel<string>(); 
+            try
+            {
+                var confirmIfEmailAlreadyExist = await _ctx.Users.AnyAsync(x => x.Email == user.Email);
+
+                if (confirmIfEmailAlreadyExist)
+                {
+                    response = response.FailedResult("Email already exist, pls login");
+                }
+                else if (user.Password != user.ConfirmPassword)
+                {
+                    response = response.FailedResult("Password does not match,Pls try again");
+                }
+                else
+                {
+
+                    var newUser = new User
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        PasswordHash = Utils.EncryptPassword(user.Password),
+                        VerificationToken = Utils.CreateRandomVerificationToken().Substring(0, 7),
+                        VerifiedAt = "unverified",
+                        TokenExpiration = DateTime.Now.AddMinutes(5).ToString(),
+
+
+                    };
+                    await _ctx.Users.AddAsync(newUser);
+                    var res = await _ctx.SaveChangesAsync();
+
+                    //Update Admin Role to the registartion
+                    var role = await _ctx.Roles.FirstOrDefaultAsync(x => x.Id == 2);
+                    var userRole = new UserRole
+                    {
+                        RoleID = role.Id,
+                        Role = role,
+                        UserID = newUser.Id,
+                        User = newUser,
+                    };
+
+                    newUser.Roles.Add(userRole);
+                    await _ctx.SaveChangesAsync();
+                    if (res > 0)
+                    {
+                        var bodyMsg = $"<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Email Verification</title>\r\n</head>\r\n<body style=\"margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;\">\r\n    <table align=\"center\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border: 1px solid #ddd;\">\r\n        <tr>\r\n            <td align=\"center\" style=\"padding: 20px 0;\">\r\n                <h2 style=\"color: #333; margin: 0;\">Email Verification</h2>\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <td style=\"padding: 10px 20px; color: #555; font-size: 16px; line-height: 1.5; text-align: center;\">\r\n                <p>Thank you {newUser.FirstName} for signing up! Please use the OTP code below to verify your email address. This code will expire in 5 minutes : {DateTime.Now.AddMinutes(5).ToString("g")}.</p>\r\n                <p style=\"font-size: 18px; font-weight: bold; color: #007bff; margin: 20px 0; text-align: center;\">\r\n                    <span style=\"background-color: #f0f0f0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 5px; display: inline-block;\">{newUser.VerificationToken}</span>\r\n                </p>\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <td style=\"padding: 20px 0; text-align: center; color: #777; font-size: 12px;\">\r\n                <p>If you did not request this, please ignore this email.</p>\r\n            </td>\r\n        </tr>\r\n    </table>\r\n</body>\r\n</html>\r\n";
+                        var sendMail = new MailRequest
+                        {
+                            Reciever = newUser.Email,
+                            Subject = "Verify your email",
+                            Body = bodyMsg
+                        };
+                        var mail = _emailService.SendEmailAsync(sendMail);
+                        response = response.SuccessResult($"You have successfully created an account,Pls check your email to verify your account");
+                    }
+                    else
+                    {
+                        response = response.FailedResult("Error trying to save to database");
+                    }
+                }
+                return response;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<ResponseModel<string>> VerifyUser(string token)
