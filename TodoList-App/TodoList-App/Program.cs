@@ -27,8 +27,6 @@ UserRepository userRepository = new UserRepository();
 Console.WriteLine("Welcome to GbemGbem Alajo Saboooo");
 
 
-
-
 while (true)
 {
 
