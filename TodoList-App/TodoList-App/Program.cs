@@ -33,7 +33,7 @@ while (true)
 
     Console.WriteLine("Work with user or work with task\n1 : work with user\n2 : work with task");
     var userChoice = int.Parse(Console.ReadLine());
-   
+
     if (userChoice == 1)
     {
         UserSelection();
@@ -53,7 +53,7 @@ while (true)
         switch (choice)
         {
             case 1:
-            Console.Write("Enter you name: ");
+            Console.Write("Enter you name: .... ");
             var name = Console.ReadLine();
             var newUser = new CreateUserDTO
             {
